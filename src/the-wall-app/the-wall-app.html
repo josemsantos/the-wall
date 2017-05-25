@@ -1,10 +1,11 @@
 <link rel="import" href="../../bower_components/polymer/polymer-element.html">
-<link rel="import" href="../../bower_components/polymer/lib/utils/async.html">
+<link rel="import" href="../../bower_components/polymerfire/firebase-app.html">
+<link rel="import" href="../../bower_components/polymerfire/firebase-auth-script.html">
+<link rel="import" href="../../bower_components/polymerfire/firebase-database-script.html">
+<link rel="import" href="../../bower_components/polymerfire/firebase-storage-script.html">
 <link rel="import" href="../../bower_components/app-media/app-media-devices.html">
 <link rel="import" href="../../bower_components/app-media/app-media-stream.html">
 <link rel="import" href="../../bower_components/app-media/app-media-video.html">
-<link rel="import" href="../../bower_components/app-media/app-media-audio.html">
-<link rel="import" href="../../bower_components/app-media/app-media-waveform.html">
 <link rel="import" href="../../bower_components/app-media/app-media-recorder.html">
 <link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
 <link rel="import" href="../../bower_components/paper-dialog-scrollable/paper-dialog-scrollable.html">
@@ -17,16 +18,34 @@
         <style>
             :host {
                 position: relative;
-                display: block;
+                display: flex;
+                flex-direction: column;
                 overflow: hidden;
-            }
-            :host(.recording) #waveform {
-                transform: translateY(0);
-                transition-delay: 0s;
+                flex: 1 1 auto;
+                --paper-dialog-scrollable: {
+                    padding: 5px;
+                    margin: 0px;
+                }
             }
             :host(.recording) #progress {
                 opacity: 1;
                 transition-delay: 0s;
+            }
+            .main-wrapper {
+                display: flex;
+                flex: 1;
+                flex-direction: column;
+            }
+            .main-content {
+                flex: 1;
+            }
+            .right-col {
+                /* 12em is the width of the columns */
+                flex: 0 0 12em;
+                background-color: #111;
+                -webkit-box-shadow: -10px 0px 35px 0px rgba(0,0,0,0.75);
+                -moz-box-shadow: -10px 0px 35px 0px rgba(0,0,0,0.75);
+                box-shadow: -10px 0px 35px 0px rgba(0,0,0,0.75);
             }
             #progress {
                 position: absolute;
@@ -41,16 +60,6 @@
                 background-color: #24CAFF;
                 opacity: 0;
             }
-            #waveform {
-                position: absolute;
-                bottom: 0;
-                left: 0;
-                width: 100%;
-                transition: transform 0.3s;
-                transition-delay: 0.3s;
-                transform: translateY(100%);
-                z-index: 1;
-            }
             #recordings {
                 display: flex;
                 flex-direction: row;
@@ -64,29 +73,52 @@
                 width: 128px;
                 height: 128px;
                 margin-right: 17px;
-            }
-            app-media-waveform {
-                height: 160px;
+                margin-bottom: 17px;
+                border: solid 1px #FFF;
+                -webkit-box-shadow: 0px 0px 35px 0px rgba(0,0,0,0.5);
+                -moz-box-shadow: 0px 0px 35px 0px rgba(0,0,0,0.5);
+                box-shadow: 0px 0px 35px 0px rgba(0,0,0,0.5);
             }
             paper-fab {
-                background-color: #444;
+                background-color: #2972e7;
+                position: absolute;
+                bottom: 20px;
+                right: 20px;
+            }
+            paper-dialog-scrollable {
+                margin: 0;
+            }
+            @media (min-width: 768px) {
+                .main-wrapper {
+                    flex-direction: row;
+                    flex: 1;
+                }
+                .main-content {
+                    flex: 1;
+                }
+                .right-col {
+                    /* 12em is the width of the columns */
+                    flex: 0 0 12em;
+                }
             }
         </style>
+        <firebase-app
+            auth-domain="the-wall-jumia-travel.firebaseapp.com"
+            database-url="https://the-wall-jumia-travel.firebaseio.com"
+            api-key="AIzaSyD8rRONvqewBo0qNRw6ABjUJhUjHUdNIOU"
+            storage-bucket="the-wall-jumia-travel.appspot.com"
+            messaging-sender-id="582315012872">
+        </firebase-app>
+
         <!-- The computer is connected to devices... -->
         <app-media-devices 
             kind="videoinput" 
             selected-device="{{videoDevice}}">
         </app-media-devices>
 
-        <app-media-devices 
-            kind="audioinput" 
-            selected-device="{{audioDevice}}">
-        </app-media-devices>
-
         <!-- ...devices are connected to the media stream.... -->
         <app-media-stream
             video-device="[[videoDevice]]"
-            audio-device="[[audioDevice]]"
             stream="{{stream}}"
             active>
         </app-media-stream>
@@ -94,13 +126,15 @@
         <!-- ...media stream is connected to the video output... -->
         <paper-dialog>
             <paper-dialog-scrollable>
-                <div style="position:relative">
+                <div style="position:relative;">
                 <app-media-video
                     id="video"
                     source="[[stream]]"
                     on-click="record"
                     autoplay
                     muted
+                    height="320"
+                    width="240"
                     mirror>
                 </app-media-video>
                 <div id="progress"></div>
@@ -117,31 +151,23 @@
             data="{{recording}}">
         </app-media-recorder>
 
-        <!-- ...and the audio analyser... -->
-        <app-media-audio
-            source="[[stream]]"
-            analyser="{{analyser}}">
-        </app-media-audio>
-
-        <section id="recordings">
-          <template is="dom-repeat" items="[[recordings]]" as="recording">
-            <a href="[[_toObjectURL(recording)]]" download="video.webm">
-              <app-media-video
-                  source="[[recording]]"
-                  loop
-                  autoplay
-                  muted>
-              <app-media-video>
-            </a>
-          </template>
-        </section>
-
-        <!-- ...analyser is connceted to the waveform visualizer! -->
-        <app-media-waveform
-            id="waveform"
-            analyser="[[analyser]]"
-            active>
-        </app-media-waveform>
+        <div class="main-wrapper">
+            <div class="main-content">
+                <section id="recordings">
+                <template is="dom-repeat" items="[[recordings]]" as="recording">
+                    <a href="[[_toObjectURL(recording)]]" download="video.webm">
+                    <app-media-video
+                        source="[[recording]]"
+                        loop
+                        autoplay
+                        muted>
+                    <app-media-video>
+                    </a>
+                </template>
+                </section>
+            </div>
+            <aside class="right-col">info</aside>
+        </div>
 
         <paper-fab on-tap="openDialog" icon="the-wall-icons:add-a-photo"></paper-fab>
 
@@ -173,24 +199,54 @@
                     elapsed: {
                         type: Number,
                         observer: '_elapsedChanged'
+                    },
+                    data: {
+                        type: Object,
+                        observer: 'dataChanged'
+                    },
+                    reader: {
+                        type: FileReader,
                     }
                 };
             }
             _recordingChanged(recording) {
                 if (recording != null) {
-                    this.push('recordings', recording);
+                    this._uploadRecording(recording);
+                    //Firebase will sync our data in real time. Don't need to bind the data anymore
+                    //this.push('recordings', recording);
                 }
                 this.classList.remove('recording');
                 setTimeout(() => {
                     this.$.progress.style.transform = '';
                 }, 600);
             }
+            _randomString() {
+                return Math.random().toString(36).substring(7);
+            }
+            _uploadRecording(recording) {
+                let _uid = this._randomString();
+                this._defaultStorage.ref("/selfies/selfie-" + _uid + ".webm").put(recording)
+                .then((snapshot) => {
+                    let _selfie = {};
+                    _selfie['selfie-' + _uid] = "selfie-" + _uid + ".webm";
+                    this._defaultDatabase.ref("selfies").update(_selfie);
+                })
+                .catch((e) => {
+                    console.log("Error while uploading", e);
+                });
+            }
             _elapsedChanged(elapsed) {
-                var progress = Math.min(100 * elapsed / this.duration, 100);
+                let progress = Math.min(100 * elapsed / this.duration, 100);
                 this.$.progress.style.transform = 'translateX(' + (-100 + progress) + '%)';
             }
             _toObjectURL(blob) {
-                return URL.createObjectURL(blob);
+                if (typeof blob !== "string") {
+                    return URL.createObjectURL(blob);
+                }
+                return blob;
+            }
+            _addRecordingFromUrl(url) {
+                this.push('recordings', url);
             }
             openDialog() {
                 this.shadowRoot.querySelector('paper-dialog').open();
@@ -198,6 +254,34 @@
             record() {
                 this.classList.add('recording');
                 this.$.recorder.start();
+            }
+            dataChanged(newData, oldData) {
+                console.log(newData)
+            }
+            connectedCallback() {
+                super.connectedCallback();
+                let mediaStream = this.shadowRoot.querySelector('app-media-stream');
+                mediaStream.videoConstraints = {
+                                                    width: {min: 240, ideal: 240, max: 240},
+                                                    height: {min: 240, ideal: 240, max: 240},
+                                                    frameRate: 10,     // Shorthand for ideal.
+                                                    facingMode: {"facingMode": "environment"}
+                                                };
+            }
+            constructor() {
+                super();
+                this.addEventListener('firebase-app-initialized', (e) => {
+                    this._defaultStorage = firebase.storage();
+                    this._defaultDatabase = firebase.database();
+                    this._defaultDatabase.ref("selfies").on("child_added", (snapshot) => {
+                        
+                        this._defaultStorage.ref('/selfies/' + snapshot.key + '.webm').getDownloadURL().then((file) => {
+                            this._addRecordingFromUrl(file);
+                        }).catch(function(e) {
+                            console.log(e)
+                        });
+                    });
+                });
             }
         }
 
