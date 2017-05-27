@@ -1,7 +1,0 @@
-{
-  "name": "The wall",
-  "short_name": "The wall",
-  "description": "This super wall shows the power of web components",
-  "start_url": "/",
-  "display": "standalone"
-}
