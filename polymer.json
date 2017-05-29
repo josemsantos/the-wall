@@ -1,7 +1,29 @@
 {
+  "entrypoint": "index.html",
+  "shell": "src/the-wall-app/the-wall-app.html",
   "lint": {
     "rules": [
       "polymer-2"
     ]
-  }
+  },
+  "sources": [
+    "bower_components/**/*.png",  
+    "src/**/*",
+    "images/**/*",
+    "bower.json"
+  ],
+  "extraDependencies": [
+    "manifest.json",
+    "bower_components/webrtc-adapter/release/adapter.js",
+    "bower_components/webcomponentsjs/webcomponents-loader.js",
+    "images/qr.png"
+  ],
+  "builds": [{
+    "name": "bundled",
+    "bundle": true,
+    "addServiceWorker": true,
+    "js": {"minify": true},
+    "css": {"minify": true},
+    "html": {"minify": true}
+  }]
 }

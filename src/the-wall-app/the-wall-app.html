@@ -209,7 +209,7 @@
                     <h1>Jumia's Travel Wall of fame</h1>
                     <p><a href="https://josemsantos.github.io/the-wall">https://josemsantos.github.io/the-wall</a></p>
                 </div>
-                <img src="http://api.qrserver.com/v1/create-qr-code/?color=000000&amp;bgcolor=FFFFFF&amp;data=https%3A%2F%2Fjosemsantos.github.io%2Fthe-wall&amp;qzone=1&amp;margin=0&amp;size=300x300&amp;ecc=L" alt="qr code" />
+                <img src="images/qr.png" alt="qr code" />
                 <paper-fab on-tap="openDialog" icon="the-wall-icons:add-a-photo"></paper-fab>
             </aside>
         </div>
@@ -318,6 +318,12 @@
                         this.shadowRoot.querySelector('app-media-recorder').mimeType = null;
                         mediaStream.active = false;
                      }
+                });
+                Polymer.RenderStatus.afterNextRender(this, () => {
+                    // Register service worker if supported.
+                    if ('serviceWorker' in navigator) {
+                        navigator.serviceWorker.register('service-worker.js', {scope: '/'});
+                    }
                 });
             }
             constructor() {
