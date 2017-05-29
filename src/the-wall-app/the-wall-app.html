@@ -26,10 +26,16 @@
                     padding: 5px;
                     margin: 0px;
                 }
+                font-family: Arial, Helvetica, sans-serif;
             }
             :host(.recording) #progress {
                 opacity: 1;
                 transition-delay: 0s;
+            }
+            h1, p > a {
+                color: #FFF;
+                padding: 16px;
+                margin: 0px;
             }
             .main-wrapper {
                 display: flex;
@@ -101,6 +107,39 @@
                     flex: 0 0 12em;
                 }
             }
+            @media (max-width: 767px) {
+                section {
+
+                    margin-bottom: 300px;
+                }
+                .right-col {
+                    display: flex;
+                    height: 300px;
+                    min-height: 300px;
+                    position: fixed;
+                    bottom: 0;
+                    width: 100%;
+                }
+                .right-col > div {
+                    flex: 1;
+                }
+                .right-col > img {
+                    width: 300px;
+                    min-width: 300px;
+                }
+                paper-fab {
+                    background-color: #2972e7;
+                    position: absolute;
+                    bottom: 20px;
+                    left: 20px;
+                    right: auto;
+                }
+            }
+            @media (max-width: 560px) {
+                .right-col > img {
+                    display: none;
+                }
+            }
         </style>
         <firebase-app
             auth-domain="the-wall-jumia-travel.firebaseapp.com"
@@ -119,8 +158,7 @@
         <!-- ...devices are connected to the media stream.... -->
         <app-media-stream
             video-device="[[videoDevice]]"
-            stream="{{stream}}"
-            active>
+            stream="{{stream}}">
         </app-media-stream>
 
         <!-- ...media stream is connected to the video output... -->
@@ -166,10 +204,17 @@
                 </template>
                 </section>
             </div>
-            <aside class="right-col">info</aside>
+            <aside class="right-col">
+                <div>
+                    <h1>Jumia's Travel Wall of fame</h1>
+                    <p><a href="https://josemsantos.github.io/the-wall">https://josemsantos.github.io/the-wall</a></p>
+                </div>
+                <img src="http://api.qrserver.com/v1/create-qr-code/?color=000000&amp;bgcolor=FFFFFF&amp;data=https%3A%2F%2Fjosemsantos.github.io%2Fthe-wall&amp;qzone=1&amp;margin=0&amp;size=300x300&amp;ecc=L" alt="qr code" />
+                <paper-fab on-tap="openDialog" icon="the-wall-icons:add-a-photo"></paper-fab>
+            </aside>
         </div>
 
-        <paper-fab on-tap="openDialog" icon="the-wall-icons:add-a-photo"></paper-fab>
+        
 
     </template>
 
@@ -250,6 +295,7 @@
             }
             openDialog() {
                 this.shadowRoot.querySelector('paper-dialog').open();
+                this.shadowRoot.querySelector('app-media-stream').active = true;
             }
             record() {
                 this.classList.add('recording');
@@ -267,6 +313,12 @@
                                                     frameRate: 10,     // Shorthand for ideal.
                                                     facingMode: {"facingMode": "environment"}
                                                 };
+                this.shadowRoot.querySelector('paper-dialog').addEventListener("opened-changed", (e) => {
+                     if (!e.detail.value) {
+                        this.shadowRoot.querySelector('app-media-recorder').mimeType = null;
+                        mediaStream.active = false;
+                     }
+                });
             }
             constructor() {
                 super();
