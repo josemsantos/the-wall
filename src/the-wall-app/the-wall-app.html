@@ -32,7 +32,8 @@
                 opacity: 1;
                 transition-delay: 0s;
             }
-            h1, p > a {
+            h1, p > a,
+            .right-col > div > p {
                 color: #FFF;
                 padding: 16px;
                 margin: 0px;
@@ -52,6 +53,11 @@
                 -webkit-box-shadow: -10px 0px 35px 0px rgba(0,0,0,0.75);
                 -moz-box-shadow: -10px 0px 35px 0px rgba(0,0,0,0.75);
                 box-shadow: -10px 0px 35px 0px rgba(0,0,0,0.75);
+            }
+            .right-col > p {
+                display: none;
+                color: #FFF;
+                margin-left: 80px;
             }
             #progress {
                 position: absolute;
@@ -136,8 +142,21 @@
                 }
             }
             @media (max-width: 560px) {
-                .right-col > img {
+                .right-col > img,
+                .right-col > div {
                     display: none;
+                }
+                .right-col {
+                    display: flex;
+                    padding: 8px;
+                    height: 80px;
+                    min-height: 80px;
+                    position: fixed;
+                    bottom: 0;
+                    width: 100%;
+                }
+                .right-col > p {
+                    display: block;
                 }
             }
         </style>
@@ -208,9 +227,11 @@
                 <div>
                     <h1>Jumia's Travel Wall of fame</h1>
                     <p><a href="https://josemsantos.github.io/the-wall">https://josemsantos.github.io/the-wall</a></p>
+                    <p>Click on the cam icon and click in the picture to start a 3 seconds record</p>
                 </div>
                 <img src="images/qr.png" alt="qr code" />
                 <paper-fab on-tap="openDialog" icon="the-wall-icons:add-a-photo"></paper-fab>
+                <p>Click on the cam icon and click in the picture to start a 3 seconds record</p>
             </aside>
         </div>
 
