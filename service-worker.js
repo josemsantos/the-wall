@@ -38,7 +38,7 @@
 'use strict';
 
 var precacheConfig = [["images/qr.png","ccb14715a7fa733ea1bf6c6200961789"],["index.html","54ef276497ed5208a05e5a291ab11de3"],["src/the-wall-app/the-wall-app.html","9c8d7290d5f09d0c58879a2a927c3547"]];
-var cacheName = 'sw-precache-v3-3-' + (self.registration ? self.registration.scope : '');
+var cacheName = 'sw-precache-v3-4-' + (self.registration ? self.registration.scope : '');
 
 
 var ignoreUrlParametersMatching = [/^utm_/];
