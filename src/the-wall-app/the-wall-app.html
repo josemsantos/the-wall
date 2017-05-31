@@ -115,38 +115,14 @@
             }
             @media (max-width: 767px) {
                 section {
-                    margin-bottom: 300px;
-                }
-                .right-col {
-                    display: flex;
-                    height: 300px;
-                    min-height: 300px;
-                    position: fixed;
-                    bottom: 0;
-                    width: 100%;
-                }
-                .right-col > div {
-                    flex: 1;
-                }
-                .right-col > img {
-                    width: 300px;
-                    min-width: 300px;
-                }
-                paper-fab {
-                    background-color: #2972e7;
-                    position: absolute;
-                    bottom: 20px;
-                    left: 20px;
-                    right: auto;
-                }
-            }
-            @media (max-width: 560px) {
-                section {
                     margin-bottom: 96px;
                 }
                 .right-col > img,
                 .right-col > div {
                     display: none;
+                }
+                #recordings {
+                    justify-content: space-around;
                 }
                 .right-col {
                     display: flex;
@@ -159,6 +135,14 @@
                 }
                 .right-col > p {
                     display: block;
+                }
+
+                paper-fab {
+                    background-color: #2972e7;
+                    position: absolute;
+                    bottom: 20px;
+                    left: 20px;
+                    right: auto;
                 }
             }
         </style>
@@ -214,14 +198,12 @@
             <div class="main-content">
                 <section id="recordings">
                 <template is="dom-repeat" items="[[recordings]]" as="recording">
-                    <a href="[[_toObjectURL(recording)]]" download="video.webm">
                     <app-media-video
                         source="[[recording]]"
                         loop
                         autoplay
                         muted>
                     <app-media-video>
-                    </a>
                 </template>
                 </section>
             </div>
@@ -314,7 +296,7 @@
                 return blob;
             }
             _addRecordingFromUrl(url) {
-                this.push('recordings', url);
+                this.unshift('recordings', url);
             }
             openDialog() {
                 this.shadowRoot.querySelector('paper-dialog').open();
